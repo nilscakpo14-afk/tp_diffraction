@@ -1,0 +1,112 @@
+# Etude de la diffraction
+
+import numpy as np
+import matplotlib.pyplot as plt
+import functions 
+import math as m
+
+
+# II. Vérification experimentale
+
+# a- Diffraction par une fente et deux fentes
+
+D = 1.00 # Distance entre l'objet diffractant et l'écran (en m)
+lambdaa = 6.328e-7 #Longueur d'onde du laser helium-neon (en m)
+L = 1e-2*np.array([1.8, 3.7, 5.6, 7.5, 9.5, 11.3]) # longueur mesurée (en m) 
+N = np.array([2, 4, 6, 8, 10, 12]) # nombre d'interfrages pour une longueur L
+
+ia = L/N # interfrange associée à a (en m)
+a = lambdaa*D/ia*1e6 # largeur de la fente (en micrometres)
+
+print(f"la largeur de la fente a est : {functions.uncertainty_A(a)[0]:.3f} +/- {functions.uncertainty_A(a)[2]:.2f} micrometres")
+
+N = np.array([15, 31, 45, 59, 63, 77]) # nombre d'interfrange associé à b pour une longuer L 
+
+ib = L/N # interfrange associé à b en m
+b = lambdaa*D/ib*1e3 # distance entre les fentes en millimetres (mm)
+
+print(f"la distance b entre les fentes est {functions.uncertainty_A(b)[0]:.3f} +/- {functions.uncertainty_A(b)[2]:.3f}")
+
+# b- comparaison des mesures expérimentales et théoriques
+
+# Utilisation d'une barette CCD pour l'observation des figures d'interférences sur un ordinateur. 
+# Création des franges d'interférences théoriques a l'aide du modele experimental et superposition aux franges expérimentales
+# Calcul de a et b théorique te détermination des erreurs relatives
+
+a_th = 77.740 # en micrometres (demonstration voir figure)
+b_th = 0.473 # en millimetres (voir figure)
+
+print(f"l'ecart relatif de a (largeur de la fente) par rapport a la valeur theorique est {functions.relative_difference(a_th, functions.uncertainty_A(a)[0]):.3f}")
+print(f"l'ecart relatif de a par rapport b (distance entre les deux fentes) la valeur theorique est {functions.relative_difference(b_th, functions.uncertainty_A(b)[0]):.3f}")
+
+# 3- diffraction par des reseaux
+# a- diffraction par transmission
+
+d = 0.8 # distance entre deux ordres de diffraction en cm
+
+# demontrons que i = lambda*D/c (voir cahier de TP)
+
+c = 7.91 *1e-5 # pas du réseau en m
+
+n = 1/c *1e-3 # nombre de traits par millimetre
+delta_n = 2 # traits par millimetres (details du calcul: voir photo)
+
+print(f"le nombre n de traits par millimetre est {n:.0f} +/- {delta_n:.0f}")
+
+# b- diffraction par reflexion
+
+# on constate que les reflexions correspondants aux differents ordres de diffraction sont assez eloignés sur l'ecran ce qui suggère un angle theta grand. 
+
+# on ne peut donc pas faire l'approximation sur theta
+
+# considérons les pas de réseaux uniquement entre l'ordre 0 et l'ordre 1
+
+i_cd = 4.2*1e-2 # distances sur l'ecran entre les ordres O et 1 en m
+i_dvd = 15.7*1e-2 # distance sur l'écran entre les ordre 0 et 1 en m
+D = 10*1e-2 # en m
+
+# c = lambdaa/sin(theta) et theta = arctan(i/D)
+
+c_cd = lambdaa/m.sin(m.atan(i_cd/D))*1e6 # pas du reseau de cd en micrometre
+c_dvd = lambdaa/m.sin(m.atan(i_dvd/D))*1e6 # pas du reaseau de dvd en micrometres
+
+# comparaison des rapports c_cd/c_dvd obtenu graphiquement et experimentalement
+
+c_cd_gr = 1.5 # en micrometres
+c_dvd_gr = 0.7 # en micrometres
+
+rapport_gr = c_cd_gr/c_dvd_gr
+rapport_exp = c_cd/c_dvd
+
+print(f"le rapport c_cd/c_dvd theorique est {rapport_gr:.3f}")
+print(f"le rapport c_cd/c_dvd experimental est {rapport_exp:.3f}")
+print(f"l'erreur relative du rapport c_cd/c_dvd par rapport a la theorie est {functions.relative_difference(rapport_gr, rapport_exp):.3f}")
+
+# Cas du blu-ray
+
+# on aurait la formule i = D*tan(theta) avec theta = arcsin(lambdaa/c)
+
+c_blu_ray_gr = 0.4*1e-6 # en m
+
+print(f"entre l'ordre 0 et 1 l'angle theta serait tel que sin(theta) = {lambdaa/c_blu_ray_gr:.3f} > 1 ce qui est impossible")
+
+# 4- cohérence spatiale
+
+L = np.array([0.9, 1.2, 1.6, 2, 5])*1e-2 # en m
+N = np.array([6, 8, 10, 12, 31])
+D = 1 # en m
+
+ib = L/N # en m
+e = lambdaa*D/ib *1e3 # largeur de la fente réglable en millimetres
+
+print(f"la valeur de e (largeur de la fente réglable) est {functions.uncertainty_A(e)[0]:.3f} +/- {functions.uncertainty_A(e)[2]:.3f} millimetres")
+
+# valeur theorique e_th
+
+lambdaa = 589*1e-9 # longueur d'onde de la raie verte de la lampe a vapeur de sodium en m
+ds = 20*1e-2 # distance entre la fente reglable et la bifente en m
+b = 300*1e-6 # distance entre les fentes de la bifente en m
+
+e_th = lambdaa*ds/b*1e3 # en mm
+
+print(f"l'ecart relatif de e (largeur de la bifente) a la theorie est {functions.relative_difference(e_th, functions.uncertainty_A(e)[0]):.3f}")
